@@ -57,13 +57,11 @@ elif [[ "${OPENVPN_PROVIDER^^}" = "FREEVPN" ]]
 then
     FREEVPN_DOMAIN=${OPENVPN_CONFIG%%-*}
     FREEVPN_DOMAIN=${FREEVPN_DOMAIN,,}
-    
     # Update FreeVPN certs
-    /etc/openvpn/updateFreeVPN.sh
+    #/etc/openvpn/updateFreeVPN.sh
     # Get password obtained from updateFreeVPN.sh
-    export OPENVPN_PASSWORD=$(cat /etc/freevpn_password)
-    rm /etc/freevpn_password
-
+    #export OPENVPN_PASSWORD=$(cat /etc/freevpn_password)
+    #rm /etc/freevpn_password
 	if [ $FREEVPN_DOMAIN == 'server1' ]
 	then
 	        export OPENVPN_PASSWORD=$(curl -s https://freevpn.me/accounts/ | grep ${FREEVPN_DOMAIN} | sed 's/^.*'"${FREEVPN_DOMAIN}"'/'"${FREEVPN_DOMAIN}"'/' | sed 's/<[^<]*//46g' | awk '{print $NF}')
