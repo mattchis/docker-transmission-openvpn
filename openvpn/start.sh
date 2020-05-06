@@ -61,7 +61,7 @@ then
     /etc/openvpn/updateFreeVPN.sh
     # Get password obtained from updateFreeVPN.sh
     export OPENVPN_PASSWORD=$(cat /etc/freevpn_password)
-    rm /etc/freevpn_password
+    #rm /etc/freevpn_password
 elif [[ "${OPENVPN_PROVIDER^^}" = "VPNBOOK" ]]
 then
     pwd_url=$(curl -s "https://www.vpnbook.com/freevpn" | grep -m2 "Password:" | tail -n1 | cut -d \" -f2)
