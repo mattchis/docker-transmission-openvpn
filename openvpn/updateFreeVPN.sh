@@ -11,13 +11,20 @@ echo "nameserver 8.8.8.8" > /etc/resolv.conf
 # Debug purpose
 # ping freevpn.me -c 4
 
-DOMAIN=${OPENVPN_CONFIG%%-*}
-OPENVPN_IP=$(curl -s https://freevpn.${DOMAIN}/accounts/ | grep IP |  sed s/"^.*IP\:.... "/""/g | sed s/"<.*"/""/g)
+SERVER=${OPENVPN_CONFIG%%-*}
+FREEVPN_DOMAIN=${OPENVPN_CONFIG%%-*}
+FREEVPN_DOMAIN=${FREEVPN_DOMAIN,,}
 
 # freevpn.me , main server, presents two servers with different address
 # and related password to be used 
-SERVER=${OPENVPN_IP%".freevpn.${DOMAIN}"}
-PASSWORD=$(curl -s https://freevpn.${DOMAIN}/accounts/ | grep Password |  sed s/"^.*Password\:.... "/""/g | sed s/"<.*"/""/g)
+if [ $FREEVPN_DOMAIN == 'server1' ]
+then
+        export PASSWORD=$(curl -s https://freevpn.me/accounts/ | grep ${FREEVPN_DOMAIN} | sed 's/^.*'"${FREEVPN_DOMAIN}"'/'"${FREEVPN_DOMAIN}"'/' | sed 's/<[^<]*//46g' | awk '{print $NF}')
+fi
+if [ $FREEVPN_DOMAIN == 'server2' ]
+then
+        export PASSWORD=$(curl -s https://freevpn.me/accounts/ | grep ${FREEVPN_DOMAIN} | sed 's/^.*'"${FREEVPN_DOMAIN}"'/'"${FREEVPN_DOMAIN}"'/' | sed 's/<[^<]*//38g' | awk '{print $NF}')
+fi
 echo "${PASSWORD}" > /etc/freevpn_password
 
 DIR="/tmp/freevpn"
@@ -25,7 +32,7 @@ TARGET="/etc/openvpn/freevpn"
 ZIP_FILE="/tmp/freevpn.zip"
 
 # Use the OPENVPN_CONFIG env var to obtain running domain
-URL=`curl -s https://freevpn."${DOMAIN}"/accounts/`
+URL=`curl -s https://freevpn.me/accounts/`
 REGEX='<a +.*href="(https:.*\.zip)"'
 
 # Create directory if not exits
@@ -58,7 +65,7 @@ do
 	
 	file_name=$(basename $file)
 
-	final_file=$DOMAIN-${file_name#*-}
+	final_file=$SERVER-${file_name#*-}
 	mv $i ${TARGET}/${final_file} > /dev/null 2>&1
 done
 
